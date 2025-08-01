@@ -1,0 +1,12 @@
+{
+    "name": "screenshot-action",
+    "version": "1.0.0",
+    "main": "screenshot.js",
+    "scripts": {},
+    "dependencies": {
+      "playwright": "^1.44.0",
+      "serve": "^14.2.0",
+      "sharp": "^0.33.0"
+    }
+  }
+  

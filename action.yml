@@ -1,0 +1,14 @@
+name: "Static Site Screenshot"
+description: "Launches a local server and captures a full-page WebP screenshot of the page using Playwright."
+author: "Krishna Kumar"
+inputs:
+  url:
+    description: "The URL to screenshot (e.g. http://localhost:5000)"
+    required: true
+  output:
+    description: "Output file path (e.g. screenshot.webp)"
+    required: false
+    default: "screenshot.webp"
+runs:
+  using: "node16"
+  main: "screenshot.js"
