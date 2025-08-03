@@ -10,18 +10,5 @@ inputs:
     required: false
     default: "screenshot.webp"
 runs:
-  using: "composite"
-  steps:
-    - name: Install dependencies
-      shell: bash
-      run: |
-        cd ${{ github.action_path }}
-        npm ci || npm install
-        npx playwright install --with-deps chromium
-    
-    - name: Run screenshot script
-      shell: bash
-      run: node ${{ github.action_path }}/screenshot.js
-      env:
-        INPUT_URL: ${{ inputs.url }}
-        INPUT_OUTPUT: ${{ inputs.output }}
+  using: "node16"
+  main: "screenshot.js"
