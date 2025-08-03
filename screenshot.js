@@ -21,8 +21,13 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
   // Check if URL is localhost - if so, start a server
   let server;
   if (url.includes('localhost') || url.includes('127.0.0.1')) {
-    console.log(`🚀 Starting local server on port ${url.split(':')[2] || 5000}...`);
-    server = spawn("npx", ["serve", ".", "-l", url.split(':')[2] || 5000], {
+    // Use GitHub workspace path if available, otherwise use current directory
+    const workspacePath = process.env.GITHUB_WORKSPACE || process.cwd();
+    const port = url.split(':')[2] || 5000;
+    console.log(`🚀 Starting local server on port ${port}...`);
+    console.log(`Serving files from: ${workspacePath}`);
+    
+    server = spawn("npx", ["serve", workspacePath, "-l", port], {
       stdio: "inherit",
       shell: true
     });
