@@ -37,14 +37,17 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     console.log(`🌐 Navigating to ${url}`);
     await page.goto(url, { waitUntil: "networkidle" });
 
-    const screenshot = await page.screenshot({ fullPage: true });
-
-    const outputPath = path.resolve(outputFile);
-    await sharp(screenshot)
+    const screenshotBuffer = await page.screenshot({ fullPage: true });
+    // Use GitHub workspace path if available, otherwise use current directory
+    const workspacePath = process.env.GITHUB_WORKSPACE || process.cwd();
+    const outputPath = path.resolve(workspacePath, outputFile);
+    await sharp(screenshotBuffer)
       .webp({ lossless: true, quality: 100, effort: 6 })
       .toFile(outputPath);
 
     console.log(`✅ Screenshot saved at ${outputPath}`);
+    // Set output for GitHub Actions
+    console.log(`::set-output name=screenshot_path::${outputPath}`);
 
     await browser.close();
   } catch (error) {
