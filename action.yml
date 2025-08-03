@@ -10,5 +10,11 @@ inputs:
     required: false
     default: "screenshot.webp"
 runs:
-  using: "node16"
-  main: "screenshot.js"
+  using: "composite"
+  steps:
+    - name: Run screenshot script
+      shell: bash
+      run: node ${{ github.action_path }}/screenshot.js
+      env:
+        INPUT_URL: ${{ inputs.url }}
+        INPUT_OUTPUT: ${{ inputs.output }}
