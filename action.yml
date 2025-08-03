@@ -15,6 +15,7 @@ runs:
     - name: Install dependencies and run screenshot
       shell: bash
       run: |
+        cd ${{ github.action_path }}
         npm install playwright sharp serve
         npx playwright install --with-deps chromium
         node ${{ github.action_path }}/screenshot.js
