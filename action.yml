@@ -12,9 +12,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Run screenshot script
+    - name: Install dependencies and run screenshot
       shell: bash
-      run: node ${{ github.action_path }}/screenshot.js
+      run: |
+        npm install playwright sharp serve
+        npx playwright install --with-deps chromium
+        node ${{ github.action_path }}/screenshot.js
       env:
         INPUT_URL: ${{ inputs.url }}
         INPUT_OUTPUT: ${{ inputs.output }}
