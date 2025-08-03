@@ -2,17 +2,17 @@
 
 This action:
 
-1. Starts a local server
-2. Opens it with Playwright
+1. Starts a local server (if using localhost URL)
+2. Opens the URL with Playwright
 3. Captures a full-page WebP screenshot
-4. Commits it back to the repo
+4. Saves it to your GitHub workspace
 
 ## 🚀 How to Use
 
-To automatically capture screenshots of your GitHub Pages site after each deployment, add this workflow to your repository:
+To automatically capture screenshots of your site and commit them back to your repository, add this workflow:
 
 ```yaml
-name: Auto Screenshot After GitHub Pages Deployment
+name: Auto Screenshot
 
 on:
   push:
@@ -32,12 +32,7 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        run: |
-          npm install
-          npx playwright install --with-deps
-
-      - name: Run Screenshot Generator
+      - name: Take Screenshot
         uses: krishna-gramener/github-screenshots@v1
         with:
           url: http://localhost:5000
@@ -57,11 +52,33 @@ jobs:
 The action accepts the following inputs:
 
 | Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `url` | URL to capture (e.g., http://localhost:5000) | Yes | - |
+|-------|-------------|----------|--------|
+| `url` | URL to capture (e.g., http://localhost:5000 or https://example.com) | Yes | - |
 | `output` | Path where the screenshot will be saved | No | `screenshot.webp` |
+
+## 🔍 How It Works
+
+- If the URL contains `localhost` or `127.0.0.1`, the action automatically starts a local server using the `serve` package
+- The server serves files from your GitHub workspace directory (`GITHUB_WORKSPACE`)
+- Screenshots are saved to your GitHub workspace directory, making them accessible for git operations
+- The action uses Playwright to capture high-quality WebP screenshots with lossless compression
 
 ## 📋 Requirements
 
-- Your project must have Node.js dependencies installed
-- Playwright is used for capturing screenshots
+- No external dependencies needed! The action automatically installs:
+  - Playwright (for browser automation)
+  - Sharp (for image processing)
+  - Serve (for local server if needed)
+
+## 🔧 Troubleshooting
+
+If you encounter issues:
+
+1. Make sure your workflow has proper permissions (`contents: write` if committing back to the repo)
+2. For local URLs, ensure your files are properly built before taking the screenshot
+3. Allow sufficient time for your server to start (the action waits 5 seconds by default)
+
+## 📝 Notes
+
+- Screenshots are saved as WebP files with lossless compression for optimal quality and size
+- The action sets an output variable `screenshot_path` with the full path to the saved screenshot
