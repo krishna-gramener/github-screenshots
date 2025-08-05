@@ -15,7 +15,7 @@ Add this to your GitHub workflow file:
 
 ```yaml
 - name: Take Screenshot
-  uses: krishna-gramener/github-screenshots@v1.1
+  uses: krishna-gramener/github-screenshots@v1.0
   with:
     url: https://example.com
     output: screenshot.png
@@ -84,7 +84,7 @@ jobs:
       # Take screenshots
       - name: Capture Screenshots
         id: screenshots
-        uses: krishna-gramener/github-screenshots@v1.1
+        uses: krishna-gramener/github-screenshots@v1.0
         with:
           # Multiple URLs (both local and remote)
           url: http://localhost:5000,http://localhost:5000/dashboard,https://example.com
@@ -116,7 +116,7 @@ jobs:
 
 ```yaml
 - name: Take screenshot of external site
-  uses: krishna-gramener/github-screenshots@v1.1
+  uses: krishna-gramener/github-screenshots@v1.0
   with:
     url: https://example.com
     output: external-screenshot.png
@@ -126,7 +126,7 @@ jobs:
 
 ```yaml
 - name: Take screenshot of local site
-  uses: krishna-gramener/github-screenshots@v1.1
+  uses: krishna-gramener/github-screenshots@v1.0
   with:
     url: http://localhost:5000
     output: local-screenshot.webp
@@ -142,7 +142,7 @@ When using localhost URLs, the action automatically:
 
 ```yaml
 - name: Take multiple screenshots
-  uses: krishna-gramener/github-screenshots@v1.1
+  uses: krishna-gramener/github-screenshots@v1.0
   with:
     url: http://localhost:5000,http://localhost:5000/about,https://example.com
     output: home.webp,about.png,external.jpg
@@ -196,7 +196,7 @@ The action sets output variables you can use in subsequent steps:
 ```yaml
 - name: Take Screenshots
   id: screenshots  # Add an ID to reference outputs
-  uses: krishna-gramener/github-screenshots@v1.1
+  uses: krishna-gramener/github-screenshots@v1.0
   with:
     url: http://localhost:5000
     output: screenshot.png
