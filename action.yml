@@ -1,14 +1,33 @@
 name: "Static Site Screenshot"
-description: "Launches a local server and captures a full-page WebP screenshot of the page using Playwright."
+description: "Launches a local server and captures full-page WebP screenshots of multiple pages using Playwright."
 author: "Krishna Kumar"
 inputs:
   url:
-    description: "The URL to screenshot (e.g. http://localhost:5000)"
+    description: "URL or comma-separated list of URLs to screenshot (e.g. http://localhost:5000 or http://localhost:5000,https://example.com)"
     required: true
   output:
-    description: "Output file path (e.g. screenshot.webp)"
+    description: "Output file path or comma-separated list of paths (e.g. screenshot.webp or home.webp,about.webp)"
     required: false
     default: "screenshot.webp"
+  width:
+    description: "Viewport width in pixels for the screenshot"
+    required: false
+    default: "1280"
+  height:
+    description: "Viewport height in pixels. If specified, captures only this height; otherwise captures full page"
+    required: false
+  webp_options:
+    description: "JSON string with WebP format options"
+    required: false
+    default: "{\"lossless\":true,\"quality\":100,\"effort\":6}"
+  png_options:
+    description: "JSON string with PNG format options"
+    required: false
+    default: "{\"quality\":100}"
+  jpeg_options:
+    description: "JSON string with JPEG format options"
+    required: false
+    default: "{\"quality\":90}"
 runs:
   using: "composite"
   steps:
@@ -22,3 +41,8 @@ runs:
       env:
         INPUT_URL: ${{ inputs.url }}
         INPUT_OUTPUT: ${{ inputs.output }}
+        INPUT_WIDTH: ${{ inputs.width }}
+        INPUT_HEIGHT: ${{ inputs.height }}
+        INPUT_WEBP_OPTIONS: ${{ inputs.webp_options }}
+        INPUT_PNG_OPTIONS: ${{ inputs.png_options }}
+        INPUT_JPEG_OPTIONS: ${{ inputs.jpeg_options }}
