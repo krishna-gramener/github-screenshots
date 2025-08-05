@@ -71,23 +71,28 @@ async function waitForServer(host, port, maxAttempts = 20, interval = 500) {
   
   log('info', 'Taking screenshots', { count: urls.length });
   
-  let server;
-  const needsLocalServer = urls.some(url => url.includes('localhost') || url.includes('127.0.0.1'));
+  // Track servers by port
+  const servers = {};
   
-  if (needsLocalServer) {
-    let port = 5000;
-    const localUrl = urls.find(url => url.includes('localhost') || url.includes('127.0.0.1')) || "localhost:5000";
-    
-    try {
-      const parsedUrl = localUrl.startsWith('http') ? new URL(localUrl) : new URL(`http://${localUrl}`);
-      if (parsedUrl.port) port = parseInt(parsedUrl.port, 10);
-    } catch (error) {
-      log('warn', 'Could not parse URL', { url: localUrl, defaultPort: 5000, error: error.message });
+  // Extract all unique ports from localhost URLs
+  const localPorts = new Set();
+  urls.forEach(url => {
+    if (url.includes('localhost') || url.includes('127.0.0.1')) {
+      try {
+        const parsedUrl = url.startsWith('http') ? new URL(url) : new URL(`http://${url}`);
+        const port = parsedUrl.port ? parseInt(parsedUrl.port, 10) : 5000;
+        localPorts.add(port);
+      } catch (error) {
+        log('warn', 'Could not parse URL', { url, defaultPort: 5000, error: error.message });
+        localPorts.add(5000); // Add default port if parsing fails
+      }
     }
-    
+  });
+  
+  // Start a server for each unique port
+  for (const port of localPorts) {
     log('info', 'Starting local server', { port, workspacePath });
-    server = spawn("npx", ["serve", workspacePath, "--listen", `${port}`], { stdio: "inherit", shell: true });
-
+    servers[port] = spawn("npx", ["serve", workspacePath, "--listen", `${port}`], { stdio: "inherit", shell: true });
     await waitForServer('localhost', port, 30, 500);
   }
 
@@ -155,9 +160,15 @@ async function waitForServer(host, port, maxAttempts = 20, interval = 500) {
     log('error', 'Error taking screenshot', { error: error.message, stack: error.stack });
     process.exit(1);
   } finally {
-    if (server) {
-      log('info', 'Stopping local server');
-      server.kill();
+    // Stop all servers
+    if (Object.keys(servers).length > 0) {
+      log('info', 'Stopping local servers');
+      for (const port in servers) {
+        if (servers[port]) {
+          log('debug', 'Stopping server on port', { port });
+          servers[port].kill();
+        }
+      }
     }
   }
 })();
