@@ -86,7 +86,7 @@ async function waitForServer(host, port, maxAttempts = 20, interval = 500) {
     }
     
     log('info', 'Starting local server', { port, workspacePath });
-    server = spawn("npx", ["serve", workspacePath, "--listen", `:${port}`], { stdio: "inherit", shell: true });
+    server = spawn("npx", ["serve", workspacePath, "--listen", `${port}`], { stdio: "inherit", shell: true });
 
     await waitForServer('localhost', port, 30, 500);
   }
