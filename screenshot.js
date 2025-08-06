@@ -104,9 +104,6 @@ async function waitForServer(host, port, maxAttempts = 20, interval = 500) {
   return false;
 }
 
-// Export functions for testing
-module.exports = { createServer, waitForServer, ensureDirectoryExists };
-
 (async () => {
   const workspacePath = process.env.GITHUB_WORKSPACE || process.cwd();
   let server = null;
