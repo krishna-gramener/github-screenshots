@@ -1,14 +1,12 @@
 name: "Static Site Screenshot"
-description: "Launches a local server and captures full-page WebP screenshots of multiple pages using Playwright."
+description: "Captures screenshots of web pages using Playwright and saves them as image files."
 author: "Krishna Kumar"
 inputs:
-  url:
-    description: "URL or comma-separated list of URLs to screenshot (e.g. http://localhost:5000 or http://localhost:5000,https://example.com)"
+  screenshots:
+    description: "Comma-separated list of URL paths and output file paths in format '/=screenshot.webp,topics/=topics/screenshot.webp,chat.html=img/chat.png'"
     required: true
-  output:
-    description: "Output file path or comma-separated list of paths (e.g. screenshot.webp or home.webp,about.webp)"
-    required: false
-    default: "screenshot.webp"
+    default: "/=screenshot.webp"
+
   width:
     description: "Viewport width in pixels for the screenshot"
     required: false
@@ -35,14 +33,14 @@ runs:
       shell: bash
       run: |
         cd ${{ github.action_path }}
-        npm install playwright sharp serve
+        npm install playwright sharp mime-types
         npx playwright install --with-deps chromium
         node ${{ github.action_path }}/screenshot.js
       env:
-        INPUT_URL: ${{ inputs.url }}
-        INPUT_OUTPUT: ${{ inputs.output }}
+        SCREENSHOTS: ${{ inputs.screenshots }}
         INPUT_WIDTH: ${{ inputs.width }}
         INPUT_HEIGHT: ${{ inputs.height }}
         INPUT_WEBP_OPTIONS: ${{ inputs.webp_options }}
         INPUT_PNG_OPTIONS: ${{ inputs.png_options }}
         INPUT_JPEG_OPTIONS: ${{ inputs.jpeg_options }}
+        INPUT_PORT: "3000"
