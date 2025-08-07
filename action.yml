@@ -33,7 +33,7 @@ runs:
       shell: bash
       run: |
         cd ${{ github.action_path }}
-        npm install playwright sharp mime-types
+        npm install playwright sharp polka sirv pino
         npx playwright install --with-deps chromium
         node ${{ github.action_path }}/screenshot.js
       env:
