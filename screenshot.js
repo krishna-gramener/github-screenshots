@@ -88,8 +88,8 @@ async function createServer(rootDir, port) {
     }
     
     // Set outputs and cleanup
-    console.log(`::set-output name=screenshot_paths::${results.join(',')}`);
-    if (results.length > 0) console.log(`::set-output name=screenshot_path::${results[0]}`);
+    log.info(`::set-output name=screenshot_paths::${results.join(',')}`);
+    if (results.length > 0) log.info(`::set-output name=screenshot_path::${results[0]}`);
     await browser.close();
   } catch (error) {
     log.error('Error taking screenshot', { error: error.message });
