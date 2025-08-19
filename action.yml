@@ -6,7 +6,6 @@ inputs:
     description: "Comma-separated list of URL paths and output file paths in format '/=screenshot.webp,topics/=topics/screenshot.webp,chat.html=img/chat.png'"
     required: true
     default: "/=screenshot.webp"
-
   width:
     description: "Viewport width in pixels for the screenshot"
     required: false
@@ -17,15 +16,16 @@ inputs:
   webp_options:
     description: "JSON string with WebP format options"
     required: false
-    default: "{\"lossless\":true,\"quality\":100,\"effort\":6}"
+    default: '{"lossless":true,"quality":100,"effort":6}'
   png_options:
     description: "JSON string with PNG format options"
     required: false
-    default: "{\"quality\":100}"
+    default: '{"quality":100}'
   jpeg_options:
     description: "JSON string with JPEG format options"
     required: false
-    default: "{\"quality\":90}"
+    default: '{"quality":90}'
+
 runs:
   using: "composite"
   steps:

@@ -14,39 +14,94 @@ A lightweight GitHub Action that captures screenshots of websites and web applic
 Add this to your GitHub workflow file:
 
 ```yaml
-- name: Take Screenshot
-  uses: krishna-gramener/github-screenshots@v1.0
-  with:
-    screenshots: "/=screenshot.webp,about.html=about.png"
+jobs:
+  screenshot:
+    - name: Take Screenshot
+      uses: krishna-gramener/github-screenshots@v1.0
+      with:
+        # Take a screenshot of the home page, /index.html, at screenshot.webp
+        screenshots: /index.html=docs/screenshot.webp
 ```
 
 ## Examples
 
 ### Local HTML Files
+
 ```yaml
-- name: Screenshot local files
-  uses: krishna-gramener/github-screenshots@v1.0
-  with:
-    screenshots: "/index.html=home.webp,/docs/about.html=about.png"
+jobs:
+  screenshot:
+    - name: Screenshot local files
+      uses: krishna-gramener/github-screenshots@v1.0
+      with:
+        # The URL "/" is the same as /index.html
+        screenshots: /=docs/screenshot.webp
+```
+
+### Multi-line Syntax (commas or newlines)
+
+```yaml
+jobs:
+  screenshot:
+    - name: Screenshot multiple pages
+      uses: krishna-gramener/github-screenshots@v1.0
+      with:
+        screenshots: |
+          /index.html=docs/screenshot.webp,
+          /about.html=docs/about.png,
+          /products/list.html=products-list.webp
+```
+
+Notes on separators and whitespace:
+
+- Accepts commas OR newlines between pairs; surrounding spaces/tabs are ignored.
+- Trailing commas and blank lines are ignored.
+- Mix-and-match commas and newlines freely.
+
+Alternate valid formats:
+
+```yaml
+# Single line, comma-separated
+screenshots: "/index.html=home.webp,/docs/about.html=about.png,/products/list.html=products.webp"
+
+# Newlines, no commas
+screenshots: |
+  /index.html=home.webp
+  /docs/about.html=about.png
+  /products/list.html=products.webp
+
+# Mixed with trailing commas and blank lines
+screenshots: |
+  /index.html=home.webp,
+
+  /docs/about.html=about.png,
+  /products/list.html=products.webp
 ```
 
 ### External Websites
+
 ```yaml
-- name: Screenshot external sites
-  uses: krishna-gramener/github-screenshots@v1.0
-  with:
-    screenshots: "https://example.com/=example.webp,https://github.com/=github.png"
+jobs:
+  screenshot:
+    - name: Screenshot external sites
+      uses: krishna-gramener/github-screenshots@v1.0
+      with:
+        screenshots: |
+          https://example.com/=example.webp,
+          https://github.com/=github.png
 ```
 
 ### Custom Options
+
 ```yaml
-- name: Screenshot with options
-  uses: krishna-gramener/github-screenshots@v1.0
-  with:
-    screenshots: "/dashboard.html=dashboard.webp"
-    width: 1440
-    height: 900
-    webp_options: '{"quality":90}'
+jobs:
+  screenshot:
+    - name: Screenshot with options
+      uses: krishna-gramener/github-screenshots@v1.0
+      with:
+        screenshots: "/index.html=docs/screenshot.webp"
+        width: 1440
+        height: 900
+        webp_options: '{"quality":90}'
 ```
 
 ## Workflow Example
@@ -56,8 +111,12 @@ name: Take Screenshots
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
+
+# Required if GITHUB_TOKEN defaults to read-only permission
+permissions:
+  contents: write
 
 jobs:
   screenshot:
@@ -65,13 +124,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-chromium
+
+      - name: Use Node with npm cache for faster installs
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
       - name: Take Screenshot
         id: screenshots
         uses: krishna-gramener/github-screenshots@v1.0
         with:
           screenshots: "/index.html=docs/screenshot.webp"
-          
+
       - name: Commit screenshots
         run: |
           git config --global user.name 'GitHub Actions'
@@ -80,6 +151,19 @@ jobs:
           git commit -m "Add screenshot" || echo "No changes"
           git push
 ```
+
+Notes:
+
+- The action creates missing directories automatically (e.g. `docs/`).
+- Caching `~/.cache/ms-playwright` reuses the Chromium browser that Playwright downloads.
+- `actions/setup-node` caches npm downloads, speeding up dependency installs inside the action.
+
+To speed up without cache:
+
+- Use WebP with lower effort: `webp_options: '{"effort":2}'` (faster encoding).
+- Limit height to avoid full-page screenshots: set `height` (e.g., `height: 800`).
+- Keep the number of screenshots small and combine pairs in one run (already supported).
+- Prefer WebP or JPEG over PNG for faster processing, when quality allows.
 
 ## Technical Implementation
 
@@ -95,14 +179,14 @@ The entire implementation is under 100 lines of code while maintaining all funct
 
 ## Configuration Options
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|--------|
-| `screenshots` | Comma-separated list of URL paths and output file paths in format `/=screenshot.webp,about.html=about.png` | Yes | `/=screenshot.webp` |
-| `width` | Viewport width in pixels for the screenshot | No | `1280` |
-| `height` | Viewport height in pixels. If specified, captures only this height; otherwise captures full page | No | - |
-| `webp_options` | JSON string with WebP format options | No | `{"lossless":true,"quality":100}` |
-| `png_options` | JSON string with PNG format options | No | `{"quality":100}` |
-| `jpeg_options` | JSON string with JPEG format options | No | `{"quality":90}` |
+| Input          | Description                                                                                                | Required | Default                           |
+| -------------- | ---------------------------------------------------------------------------------------------------------- | -------- | --------------------------------- |
+| `screenshots`  | Comma-separated list of URL paths and output file paths in format `/=screenshot.webp,about.html=about.png` | Yes      | `/=screenshot.webp`               |
+| `width`        | Viewport width in pixels for the screenshot                                                                | No       | `1280`                            |
+| `height`       | Viewport height in pixels. If specified, captures only this height; otherwise captures full page           | No       | -                                 |
+| `webp_options` | JSON string with WebP format options                                                                       | No       | `{"lossless":true,"quality":100}` |
+| `png_options`  | JSON string with PNG format options                                                                        | No       | `{"quality":100}`                 |
+| `jpeg_options` | JSON string with JPEG format options                                                                       | No       | `{"quality":90}`                  |
 
 ## How It Works
 
@@ -115,22 +199,12 @@ The entire implementation is under 100 lines of code while maintaining all funct
    - It saves the screenshot to the specified output path using Sharp for optimal image processing
 5. When finished, the built-in server is automatically shut down
 
-## Examples
-
-### Basic Example
-
-```yaml
-- name: Take Screenshot
-  uses: krishna-gramener/github-screenshots@v1.0
-  with:
-    screenshots: "/=screenshot.webp"
-```
-
 ## Troubleshooting
 
 ### "Cannot find module 'playwright'"
 
 This error occurs when the dependencies aren't installed correctly. We've fixed this by:
+
 - Adding `cd ${{ github.action_path }}` in action.yml to install dependencies in the correct location
 - Ensuring all dependencies (playwright, sharp, polka, sirv, pino) are installed before running the script
 
@@ -161,27 +235,32 @@ This action sets the following outputs that you can use in subsequent steps:
 - `screenshot_path`: Path to the first screenshot (for convenience)
 
 ```yaml
-- name: Take Screenshots
-  id: screenshots  # Add an ID to reference outputs
-  uses: krishna-gramener/github-screenshots@v1.0
-  with:
-    screenshots: "/=screenshot.png"
+jobs:
+  screenshot:
+    - name: Take Screenshots
+      id: screenshots  # Add an ID to reference outputs
+      uses: krishna-gramener/github-screenshots@v1.0
+      with:
+        screenshots: "/=screenshot.png"
 
-- name: Use Screenshot Path
-  run: echo "Screenshot saved at: ${{ steps.screenshots.outputs.screenshot_path }}"
+    - name: Use Screenshot Path
+      run: echo "Screenshot saved at: ${{ steps.screenshots.outputs.screenshot_path }}"
 ```
 
 ### Using Screenshot Outputs
 
 ```yaml
-- name: Upload Screenshots
-  uses: actions/upload-artifact@v3
-  with:
-    name: screenshots
-    path: ${{ steps.screenshots.outputs.screenshot_paths }}
+jobs:
+  screenshot:
+    - name: Upload Screenshots
+      uses: actions/upload-artifact@v3
+      with:
+        name: screenshots
+        path: ${{ steps.screenshots.outputs.screenshot_paths }}
 ```
 
 Available outputs:
+
 - `screenshot_path`: Path to the first screenshot
 - `screenshot_paths`: Comma-separated list of paths to all screenshots
 
@@ -189,9 +268,7 @@ Available outputs:
 
 - **WebP options**: [Sharp WebP documentation](https://sharp.pixelplumbing.com/api-output#webp)
   - Example: `{"lossless":true,"quality":100,"effort":6}`
-
 - **PNG options**: [Sharp PNG documentation](https://sharp.pixelplumbing.com/api-output#png)
   - Example: `{"quality":100}`
-
 - **JPEG options**: [Sharp JPEG documentation](https://sharp.pixelplumbing.com/api-output#jpeg)
   - Example: `{"quality":90,"progressive":true}`
