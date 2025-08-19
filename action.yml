@@ -13,6 +13,10 @@ inputs:
   height:
     description: "Viewport height in pixels. If specified, captures only this height; otherwise captures full page"
     required: false
+  host:
+    description: "Host interface for the local static server (use '127.0.0.1' in restricted environments)"
+    required: false
+    default: "0.0.0.0"
   webp_options:
     description: "JSON string with WebP format options"
     required: false
@@ -40,6 +44,7 @@ runs:
         SCREENSHOTS: ${{ inputs.screenshots }}
         INPUT_WIDTH: ${{ inputs.width }}
         INPUT_HEIGHT: ${{ inputs.height }}
+        INPUT_HOST: ${{ inputs.host }}
         INPUT_WEBP_OPTIONS: ${{ inputs.webp_options }}
         INPUT_PNG_OPTIONS: ${{ inputs.png_options }}
         INPUT_JPEG_OPTIONS: ${{ inputs.jpeg_options }}

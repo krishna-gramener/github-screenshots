@@ -8,18 +8,17 @@ const pino = require("pino");
 
 // Configure minimal logger and helpers
 const log = pino({ level: process.env.LOG_LEVEL || "info" });
-const ensureDir = async (dir) =>
-  fs.mkdir(dir, { recursive: true }).catch((e) => (e.code === "EEXIST" ? null : Promise.reject(e)));
+const ensureDir = async (dir) => fs.mkdir(dir, { recursive: true });
 
 // Create a simple HTTP server with polka and sirv
-async function createServer(rootDir, port) {
+async function createServer(rootDir, host, port) {
   return new Promise((resolve, reject) => {
     // Create server with sirv middleware
     const server = polka()
       .use(sirv(rootDir, { dev: true }))
-      .listen(port, (err) => {
+      .listen(port, host, (err) => {
         if (err) return reject(err);
-        log.info("Server listening", { port, rootDir });
+        log.info("Server listening", { host, port, rootDir });
         resolve(server);
       });
   });
@@ -53,10 +52,11 @@ async function createServer(rootDir, port) {
   // Start local server if needed
   let server = null;
   const port = parseInt(process.env.INPUT_PORT || "3000", 10);
+  const host = process.env.INPUT_HOST || "0.0.0.0";
   const isAbsoluteUrl = (url) => /^https?:\/\//i.test(url);
   if (screenshotPairs.some((pair) => !isAbsoluteUrl(pair.urlPath))) {
-    log.info("Starting local server", { port });
-    server = await createServer(workspacePath, port);
+    log.info("Starting local server", { host, port });
+    server = await createServer(workspacePath, host, port);
   }
 
   try {
@@ -69,9 +69,8 @@ async function createServer(rootDir, port) {
     const results = [];
     for (const { urlPath, outputPath } of screenshotPairs) {
       // Build URL and navigate
-      const url = isAbsoluteUrl(urlPath)
-        ? urlPath
-        : `http://localhost:${port}${urlPath.startsWith("/") ? urlPath : "/" + urlPath}`;
+      const localPath = urlPath.startsWith("/") ? urlPath : "/" + urlPath;
+      const url = isAbsoluteUrl(urlPath) ? urlPath : `http://localhost:${port}${localPath}`;
       log.info("Processing", { url, output: outputPath });
 
       await page.goto(url, { waitUntil: "load", timeout: 30000 });

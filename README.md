@@ -177,6 +177,11 @@ This action is built with modern, lightweight libraries to keep the codebase min
 
 The entire implementation is under 100 lines of code while maintaining all functionality.
 
+## Testing
+
+- Unit tests: run `npm test` to execute fast, mocked tests in `tests/screenshot.unit.test.js`.
+- Manual E2E: run `node tests/screenshot.e2e.manual.js [case-index]` to exercise real Playwright/Sharp and write files to `test-results/`.
+
 ## Configuration Options
 
 | Input          | Description                                                                                                | Required | Default                           |
@@ -184,6 +189,7 @@ The entire implementation is under 100 lines of code while maintaining all funct
 | `screenshots`  | Comma-separated list of URL paths and output file paths in format `/=screenshot.webp,about.html=about.png` | Yes      | `/=screenshot.webp`               |
 | `width`        | Viewport width in pixels for the screenshot                                                                | No       | `1280`                            |
 | `height`       | Viewport height in pixels. If specified, captures only this height; otherwise captures full page           | No       | -                                 |
+| `host`         | Host interface for the local static server (use `127.0.0.1` in restricted environments)                    | No       | `0.0.0.0`                         |
 | `webp_options` | JSON string with WebP format options                                                                       | No       | `{"lossless":true,"quality":100}` |
 | `png_options`  | JSON string with PNG format options                                                                        | No       | `{"quality":100}`                 |
 | `jpeg_options` | JSON string with JPEG format options                                                                       | No       | `{"quality":90}`                  |
@@ -225,6 +231,7 @@ This error occurs when the dependencies aren't installed correctly. We've fixed 
 
 - **Blank screenshots**: Ensure HTML files and assets are properly loaded
 - **Server issues**: Default port is 3000, specify different port if needed
+- **Server binding**: By default binds to `0.0.0.0`. In some environments, binding to all interfaces is restricted. Set `host: '127.0.0.1'` in the action inputs to bind only to localhost.
 - **Missing dependencies**: Action installs dependencies automatically
 
 ## Action Outputs
