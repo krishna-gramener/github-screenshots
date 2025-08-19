@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for Screenshot Action</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .test-element {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e9f7fe;
+            border-left: 4px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Screenshot Action Test Page</h1>
+        <div class="test-element">
+            <h2>Test Element 1</h2>
+            <p>This page is used to test the GitHub Screenshot Action.</p>
+        </div>
+        <div class="test-element">
+            <h2>Test Element 2</h2>
+            <p>The action should capture this entire page as a screenshot.</p>
+        </div>
+        <div class="test-element">
+            <h2>Test Element 3</h2>
+            <p>Testing viewport width: <span id="viewport-width"></span>px</p>
+            <p>Testing viewport height: <span id="viewport-height"></span>px</p>
+        </div>
+    </div>
+
+    <script>
+        // Display viewport dimensions
+        document.getElementById('viewport-width').textContent = window.innerWidth;
+        document.getElementById('viewport-height').textContent = window.innerHeight;
+    </script>
+</body>
+</html>
